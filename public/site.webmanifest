@@ -1,0 +1,14 @@
+{
+  "name": "GoPilot by RASID",
+  "short_name": "GoPilot",
+  "description": "The geospatial AI agent. Ask in plain language, get raster and vector layers back.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#008B6A",
+  "background_color": "#F8F7F7",
+  "icons": [
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
