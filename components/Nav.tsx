@@ -22,9 +22,9 @@ export default function Nav() {
     <header className="sticky top-0 z-50 h-16 border-b border-slate-200 bg-white/85 backdrop-blur-md">
       <nav
         aria-label="Main"
-        className="mx-auto flex h-16 max-w-page items-center gap-6 px-4 sm:px-6 lg:px-8"
+        className="mx-auto flex h-16 max-w-page items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8"
       >
-        <Link href="/#hero" className="flex shrink-0 items-center gap-2.5">
+        <Link href="/#hero" className="flex shrink-0 items-center gap-2 sm:gap-2.5">
           {/* GoPilot's own mark, not RASID's: this page sells the product, and
               the parent brand is carried by the "by RASID" lockup beside it.
               The mark only — the full lockup bakes in two tagline lines that are
@@ -33,8 +33,16 @@ export default function Nav() {
               screen reader announcing "GoPilot GoPilot by RASID" is noise. */}
           {/* eslint-disable-next-line @next/next/no-img-element -- static export,
               images.unoptimized: next/image would add a wrapper for no gain. */}
-          <img src="/brand/gopilot-mark.svg" alt="" width="32" height="32" className="h-8 w-8" />
-          <span className="font-display text-lg font-bold tracking-tight text-brand">GoPilot</span>
+          <img
+            src="/brand/gopilot-mark.svg"
+            alt=""
+            width="32"
+            height="32"
+            className="h-7 w-7 sm:h-8 sm:w-8"
+          />
+          <span className="font-display text-base font-bold tracking-tight text-brand sm:text-lg">
+            GoPilot
+          </span>
           <span className="hidden text-[11px] font-medium text-slate-500 sm:inline">by RASID</span>
         </Link>
 
@@ -51,17 +59,24 @@ export default function Nav() {
           ))}
         </ul>
 
-        <div className="ml-auto flex items-center gap-3 lg:ml-0">
+        <div className="ml-auto flex items-center gap-1 sm:gap-3 lg:ml-0">
           {/* One call to action only. A "Sign in" link beside it competes for the
               same click from a visitor who has no account yet, which is almost
               everyone arriving here. Returning users reach the app through the
               footer's Sign in link, or straight from their bookmark. */}
 
-          {/* Two spans so the button never wraps on a 320px screen. */}
-          <a href={SITE.ctaPrimaryHref} className="btn btn-primary">
-            <span className="sm:hidden">{ctaShort}</span>
+          {/* Two spans so the button never wraps on a 320px screen. BOTH need
+              `whitespace-nowrap`: the short label is still two words, and
+              without the guard it broke after "Sign up" at 320px, growing the
+              button to two lines inside a 64px-tall header. The trailing arrow
+              is decorative, so it is dropped below `sm` to buy back the ~20px
+              that keeps the burger on screen on the narrowest phones. */}
+          <a href={SITE.ctaPrimaryHref} className="btn btn-primary px-3 sm:px-4">
+            <span className="whitespace-nowrap sm:hidden">{ctaShort}</span>
             <span className="hidden whitespace-nowrap sm:inline">{SITE.ctaPrimaryLabel}</span>
-            <span aria-hidden="true">&rarr;</span>
+            <span aria-hidden="true" className="hidden sm:inline">
+              &rarr;
+            </span>
           </a>
 
           <NavMobile />
