@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import NavMobile from '@/components/NavMobile'
 import { NAV_LINKS } from '@/lib/content/nav'
 import { SITE } from '@/lib/content/site'
@@ -23,7 +24,7 @@ export default function Nav() {
         aria-label="Main"
         className="mx-auto flex h-16 max-w-page items-center gap-6 px-4 sm:px-6 lg:px-8"
       >
-        <a href="#hero" className="flex shrink-0 items-center gap-2.5">
+        <Link href="/#hero" className="flex shrink-0 items-center gap-2.5">
           {/* GoPilot's own mark, not RASID's: this page sells the product, and
               the parent brand is carried by the "by RASID" lockup beside it.
               The mark only — the full lockup bakes in two tagline lines that are
@@ -35,17 +36,17 @@ export default function Nav() {
           <img src="/brand/gopilot-mark.svg" alt="" width="32" height="32" className="h-8 w-8" />
           <span className="font-display text-lg font-bold tracking-tight text-brand">GoPilot</span>
           <span className="hidden text-[11px] font-medium text-slate-500 sm:inline">by RASID</span>
-        </a>
+        </Link>
 
         <ul className="ml-auto hidden items-center gap-7 lg:flex">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
-              <a
+              <Link
                 href={link.href}
                 className="text-sm font-medium text-slate-600 transition-colors hover:text-brand-dark"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

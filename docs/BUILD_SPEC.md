@@ -3844,3 +3844,108 @@ A GIS analyst lands here, reads for forty seconds, and can answer four questions
 4. **What does it cost to find out?** `Sign up free · 500 tokens. No credit card.`
 
 If a change to this page makes any of those four harder to answer in forty seconds, the change is wrong.
+
+---
+
+## 31. AMENDMENT A, RELEASE NOTES
+
+**Status:** this section AMENDS the contract above. Sections 0 to 30 described a single-page site, and the file manifest in §23 did not contain a `/releases` route. It does now. Everything else in this document stands.
+
+### 31.1 Why this exists on the landing page and not in the product
+
+The portal at `app.gopilot.earth` is entirely behind a login. Nothing in it can be crawled by a search engine or quoted by an answer engine, which means the product's own record of what it ships, the one page that proves the thing is alive and improving, was invisible to every acquisition channel this site is built to serve.
+
+So the changelog is published here, as static indexable HTML, and the portal links out to it. The product keeps the *cards* in Settings > Releases because a signed-in user still wants to know what changed; clicking one opens this site in a new tab. There is deliberately no second copy of the release body inside the portal: a copy nobody can link to is the one that rots.
+
+### 31.2 Routes added
+
+| Route | Output | Purpose |
+|---|---|---|
+| `/releases/` | static | Changelog index. Newest release featured with its image, the rest in a grid. |
+| `/releases/<id>/` | static, one per release via `generateStaticParams` | One release. Title, version, type, date, featured image, full body, prev/next, one CTA band. |
+
+Both are composed the way §19 requires: `Nav`, `main`, `Footer`, and no `"use client"` at the route level.
+
+### 31.3 PRODUCTION DATA, ALWAYS
+
+The portal also runs a beta deployment. Its release table is a **different and shorter list**: 3 rows against production's 10 at the time of writing, with ids that happen to overlap today and need not tomorrow.
+
+**Ruling:** this site reads `https://api.rasid.ai/api` and nothing else. `NEXT_PUBLIC_RELEASES_API` exists only so a staging build of *this site* can be pointed elsewhere; it is not a beta switch. A public changelog built from beta rows would announce features nobody outside the company can reach, which is the same class of error as §1.1 and §1.4: shipping a claim the product cannot honour.
+
+### 31.4 The data is snapshotted at build time, not fetched in the pages
+
+`scripts/fetch-releases.mjs` runs in `prebuild`, reads the API once, and writes `lib/content/releases.generated.json`. `lib/releases.ts` is the only reader. The file is gitignored, regenerated on every build, and its contents are printed to the build log.
+
+This is not a preference. Two constraints rule out the obvious alternatives:
+
+1. **An uncacheable fetch fails the build.** `output: 'export'` requires every `fetch` to be cacheable. `app/sitemap.ts` is `force-static` and needs the release list, so `cache: 'no-store'` there ends the export with `Route /sitemap.xml with dynamic = "error" couldn't be rendered statically`. Verified by hitting it.
+2. **The cacheable default would serve a stale changelog.** `force-cache` writes into `.next/cache/fetch-cache` with no expiry, and the Netlify Next plugin restores `.next/cache` between deploys. A rebuild could then regenerate the changelog from a cached copy of the API and nobody would notice. For a changelog that is the entire bug.
+
+A plain Node fetch in `prebuild` has no framework caching at all, so it sidesteps both and makes the build deterministic and inspectable.
+
+### 31.5 The list endpoint is a summary. Hydrate every release.
+
+`GET /releases/` returns `id, version, title, summary, release_type, is_featured, release_date, featured_image`.
+
+It does **not** return `content`, `created_at` or `updated_at`.
+
+Building the snapshot from the list alone therefore exports ten release pages with empty bodies, and leaves the sitemap with no real `lastModified`. The script reads the list for the set of ids, then fetches `GET /releases/<id>/` for each one. It throws if any release comes back without `content`, because a release page with an empty body gets indexed as thin content, and that is worse than a failed build.
+
+### 31.6 URLs are keyed by the API numeric id
+
+**Decision, taken by the product owner:** `/releases/10/`, not `/releases/5-0-0/`.
+
+The known limitation, recorded here so nobody rediscovers it as a bug: **release ids are assigned per database.** This site generates its pages from production ids. A portal deployment whose release table has diverged from production links correctly only while the two agree. Specifically, a release that exists on beta and not on production has no page here, and its Settings card will 404.
+
+The alternative considered and rejected was keying on `version`, which is stable across environments. If the two release tables ever diverge in practice, that is the fix to reach for.
+
+### 31.7 SEO and GEO surface
+
+Per release page:
+
+- `<title>` is `<Title> (v<Version>) | GoPilot`, inheriting the §18 template. The title alone is not self-describing: "Workspace" means nothing in a tab or a result row, so the version carries it.
+- `description` is the release's own `summary`. No hand-written duplicates to drift.
+- `canonical` carries the trailing slash, per `trailingSlash: true`. Without it the canonical points at a 308.
+- OpenGraph `type: article` with `publishedTime`, `modifiedTime` and the release `featured_image`. That image is an absolute URL on the API host; `metadataBase` only rewrites relative paths, so it passes through as is.
+- Two JSON-LD blocks: `TechArticle` (not `BlogPosting`, these are versioned product docs) whose `about` points at the `SoftwareApplication` node §20 already declares and whose `isPartOf` points at the collection, plus a `BreadcrumbList`. Serialized with the same `<` escaping as §20, for the same reason.
+
+The index carries a `CollectionPage` with an `ItemList` in descending order, so an answer engine can read the whole set in order without executing anything.
+
+`app/sitemap.ts` became `async` and appends one entry per release, using each release's own `updated_at` as `lastModified` rather than the shared `BUILD_TIME` the static routes use: for these the real modification date is known, and it is the signal that tells a crawler which notes changed.
+
+`components/Footer.tsx` gained a `Release notes` link under Product. Without an in-site link the changelog is an orphan that depends entirely on the sitemap to be found, and orphaned pages are discounted. That edit also required a one-line fix to `isSameBrand()`, which threw on a bare path and so treated a link to this very site as external and opened it in a new tab.
+
+### 31.8 A new release does not appear until this site rebuilds
+
+This follows directly from §31.4 and is the one operational fact to hold on to. Publishing a release in the RASID admin and deploying this site are two separate acts. The backend is frozen and cannot call a build hook, so the trigger is owned by the team, not by this repository. The options, for whoever wires it:
+
+- a Netlify build hook fired when a release is published, for same-day publication;
+- a Netlify scheduled build, so a release goes public within the period with nothing to remember;
+- both, which is the only combination with no silent lag.
+
+Until one exists, `/releases/` shows whatever was true at the last deploy.
+
+### 31.9 Verification performed
+
+- `npx tsc --noEmit` clean. `npm run build` exports 17 pages, including `/releases` and ten `/releases/[id]`.
+- `out/releases/10/index.html` contains the real `<title>`, `description`, `canonical`, four `og:*` tags, and `TechArticle` plus `BreadcrumbList` JSON-LD, with the release body present in the static HTML. Checked by reading the exported file, not by trusting the framework.
+- `out/sitemap.xml` lists 12 URLs: `/`, `/releases/`, and ten release pages, every one with a trailing slash.
+- The index was rendered from the exported `out/` directory and reviewed.
+
+### 31.10 The nav gains a fifth item, and the shared chrome stops assuming it is on the home page
+
+**Nav item.** `NAV_LINKS` in `lib/content/nav.ts` gains `{ label: 'Releases', href: '/releases/' }`, after `Pricing`. §4 specified a four-item row and §1.19 refused a fifth, but the reason it gave was that `Docs` had no verified URL and would be a dead link. This fifth item is a real, generated page, so the reason does not apply. Still no mega-menu and no dropdowns. Both the desktop row and the mobile sheet read the same list, so they cannot drift.
+
+**Every section target in the shared chrome is now root-relative.** `Nav`, `NavMobile` and `Footer` render on `/releases/` and `/releases/<id>/` as well as the home page. A bare `#pricing` on those pages points at an element that does not exist, so the link silently does nothing: the exported release page carried **twelve** such dead anchors before this fix. All of them are now `/#id`, which navigates home and scrolls from a sub-page and is still treated as a same-document fragment on the home page itself.
+
+Affected: the four `NAV_LINKS` section targets, the `Nav` logo, and the footer's `GoPilot` and `Pricing` entries.
+
+**Internal links go through `next/link`.** Once those hrefs became `/...`, Next's `no-html-link-for-pages` rule fails the build on a plain `<a>`. `Nav`, `NavMobile` and `Footer` now use `Link` for them. Note the footer's test is `href.startsWith('/')`, **not** `isSameBrand()`: that helper is also true for `rasid.ai`, which is a separate origin and must stay a plain anchor with `target="_blank"`.
+
+**The skip link in §18 now targets `#main`.** It pointed at `#hero`, which exists only on the home page, so on a release page the first thing a keyboard user tabs to did nothing. Every page's `<main>` now carries `id="main"`. This was introduced by §31.2 adding pages that reuse the layout, and it is the kind of regression that no visual check catches.
+
+### 31.11 Not done here
+
+- No per-release OG image beyond the API `featured_image`. A release without one falls back to the site default from §18.
+- No pagination on `/releases/`. Ten releases is one page; past roughly forty this needs revisiting.
+- No RSS or Atom feed. Worth adding if the changelog becomes a subscribe-able surface.

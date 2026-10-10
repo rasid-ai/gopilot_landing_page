@@ -36,3 +36,7 @@ yarn-error.log*
 
 # research provenance — keep locally, never ship
 .research/
+
+# Build-time snapshot of the release notes (scripts/fetch-releases.mjs).
+# Regenerated on every build; never edited by hand, so it is not tracked.
+lib/content/releases.generated.json

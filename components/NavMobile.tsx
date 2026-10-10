@@ -2,6 +2,7 @@
 
 import { Menu, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { NAV_LINKS } from '@/lib/content/nav'
 import { SITE } from '@/lib/content/site'
 
@@ -119,14 +120,14 @@ export default function NavMobile() {
           }`}
         >
           {NAV_LINKS.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               onClick={close}
               className="rounded-lg px-2 py-2.5 text-base font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-dark"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
 
           <div className="my-3 border-t border-slate-200" />

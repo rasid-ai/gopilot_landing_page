@@ -179,7 +179,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="bg-white font-sans text-slate-800 antialiased">
         <a
-          href="#hero"
+          /* #main, not #hero: the hero only exists on the home page, so on
+             /releases/ and /releases/<id>/ this skip link used to point at
+             nothing and the first thing a keyboard user tabs to did nothing.
+             Every page gives its <main> this id. */
+          href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-brand-dark focus:shadow-lg"
         >
           Skip to content

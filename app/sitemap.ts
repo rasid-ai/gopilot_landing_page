@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { getAllReleases } from '@/lib/releases'
 
 /* `output: 'export'` has no server, so Next refuses to build a metadata route
    unless it is explicitly declared static. Without this line the build fails
@@ -25,19 +26,41 @@ type Route = {
 const routes: Route[] = [
   { path: '/', changeFrequency: 'weekly', priority: 1.0 },
 
+  /* The changelog index. Its per-release children are appended below from the
+     API rather than listed here, because the set changes with every release and
+     a hand-maintained list would go stale silently. */
+  { path: '/releases', changeFrequency: 'weekly', priority: 0.7 },
+
   // Uncomment each line ONLY once the corresponding app/<route>/page.tsx exists
   // and returns 200 in the exported `out/` directory.
   // { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 },
   // { path: '/terms',   changeFrequency: 'yearly', priority: 0.3 },
 ]
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // `next.config.ts` sets trailingSlash: true, so every URL here must end in a
   // slash or the sitemap points at a 308 instead of the canonical page.
-  return routes.map(({ path, changeFrequency, priority }) => ({
-    url: path === '/' ? `${SITE_URL}/` : `${SITE_URL}${path}/`,
-    lastModified: BUILD_TIME,
-    changeFrequency,
-    priority,
+  const staticEntries: MetadataRoute.Sitemap = routes.map(
+    ({ path, changeFrequency, priority }) => ({
+      url: path === '/' ? `${SITE_URL}/` : `${SITE_URL}${path}/`,
+      lastModified: BUILD_TIME,
+      changeFrequency,
+      priority,
+    })
+  )
+
+  /* One entry per release page that `app/releases/[id]` actually exported, from
+     the same source, so the sitemap cannot list a URL that is not in `out/`.
+     `lastModified` is each release's own updated_at here, unlike the shared
+     BUILD_TIME above: for these the real modification date is known, and it is
+     the signal that tells a crawler which release notes changed. */
+  const releases = await getAllReleases()
+  const releaseEntries: MetadataRoute.Sitemap = releases.map((release) => ({
+    url: `${SITE_URL}/releases/${release.id}/`,
+    lastModified: new Date(release.updated_at),
+    changeFrequency: 'yearly',
+    priority: 0.5,
   }))
+
+  return [...staticEntries, ...releaseEntries]
 }

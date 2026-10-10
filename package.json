@@ -5,7 +5,7 @@
   "description": "Landing page for GoPilot — the geospatial AI agent by RASID",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/check-assets.mjs",
+    "prebuild": "node scripts/check-assets.mjs && node scripts/fetch-releases.mjs",
     "build": "next build",
     "start": "next start",
     "serve": "npx --yes serve out -l 4000",

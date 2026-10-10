@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { SITE } from '@/lib/content/site'
 
 type FooterLink = { label: string; href: string }
@@ -20,11 +21,15 @@ const FOOTER_COLUMNS: readonly FooterColumn[] = [
   {
     title: 'Product',
     links: [
-      { label: 'GoPilot', href: '#hero' },
+      { label: 'GoPilot', href: '/#hero' },
       { label: 'GoServers / MCP', href: 'https://rasid.ai/products#mcps' },
       { label: 'QGIS plugin', href: SITE.qgisHref },
       { label: 'ArcGIS Pro add-in', href: 'https://rasid.ai/products#plugins' },
-      { label: 'Pricing', href: '#pricing' },
+      { label: 'Pricing', href: '/#pricing' },
+      /* The changelog's only in-site entry point. Without a link from a page
+         that is already crawled, /releases/ is an orphan that depends entirely
+         on the sitemap to be discovered, and orphaned pages are discounted. */
+      { label: 'Release notes', href: '/releases/' },
       { label: 'Try with no account', href: SITE.ctaTryHref },
       // The only Sign in on the page. The header and the mobile sheet carry a
       // single sign-up CTA, so this is the route back in for someone who
@@ -76,6 +81,10 @@ const FOOTER_COLUMNS: readonly FooterColumn[] = [
  */
 function isSameBrand(href: string): boolean {
   if (href.startsWith('#') || href.startsWith('mailto:')) return true
+  /* Root-relative links are this site. Without this they fall through to
+     `new URL()`, which throws on a bare path, and a page on gopilot.earth would
+     open in a new tab as if it were someone else's domain. */
+  if (href.startsWith('/')) return true
   try {
     const { hostname } = new URL(href)
     return hostname === 'rasid.ai' || hostname.endsWith('.rasid.ai')
@@ -138,15 +147,29 @@ export default function Footer() {
               <ul className="mt-4 space-y-2.5">
                 {column.links.map((link) => {
                   const external = !isSameBrand(link.href)
+                  /* A link to THIS site goes through next/link, which Next's
+                     no-html-link-for-pages rule requires for internal routes and
+                     which also prefetches. `isSameBrand` is a different question:
+                     it is true for rasid.ai as well, and that is still a separate
+                     origin that must stay a plain anchor. */
+                  const internal = link.href.startsWith('/')
+                  const className =
+                    'text-sm text-white/75 transition-colors hover:text-white'
                   return (
                     <li key={link.href}>
-                      <a
-                        className="text-sm text-white/75 transition-colors hover:text-white"
-                        href={link.href}
-                        {...(external ? { target: '_blank', rel: 'noopener' } : {})}
-                      >
-                        {link.label}
-                      </a>
+                      {internal ? (
+                        <Link className={className} href={link.href}>
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <a
+                          className={className}
+                          href={link.href}
+                          {...(external ? { target: '_blank', rel: 'noopener' } : {})}
+                        >
+                          {link.label}
+                        </a>
+                      )}
                     </li>
                   )
                 })}
