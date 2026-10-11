@@ -49,6 +49,6 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   },
   {
     q: 'Is GoPilot free, and what is a token?',
-    a: "Yes, there is a free plan: EUR 0 per month with 500 tokens, basic datasets and models, raster and vector export, session history and 1 GB of storage, and no credit card. Tokens pay for GoPilot's work. A turn costs what it costs, so a long analysis over large rasters uses more than a one-line question, and unused tokens expire when the period resets rather than rolling over. Tokens are used across GoPilot, GoBox, and RASID's MCP / API services. The paid plans are Pro at EUR 149 per month with 5,000 tokens, Business at EUR 499 per month with 25,000 tokens, and Enterprise with custom pricing.",
+    a: "Yes, there is a free plan: EUR 0 per month with 50,000 tokens, basic datasets and models, raster and vector export, session history and 1 GB of storage, and no credit card. Tokens pay for GoPilot's work. A turn costs what it costs, so a long analysis over large rasters uses more than a one-line question, and unused tokens expire when the period resets rather than rolling over. Tokens are used across GoPilot, GoBox, and RASID's MCP / API services. The paid plans are Pro at EUR 149 per month with 500,000 tokens, Business at EUR 499 per month with 2,500,000 tokens, and Enterprise with custom pricing.",
   },
 ]

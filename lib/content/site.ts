@@ -22,7 +22,7 @@ export const SITE = {
      exactly how that guarantee rots.
      Anything deriving a substring from this must split on the middot, not on
      `' · '` with ordinary spaces. */
-  ctaPrimaryLabel: 'Sign up free · 500 tokens',
+  ctaPrimaryLabel: 'Sign up free · 50,000 tokens',
   ctaPrimaryHref: 'https://app.gopilot.earth/auth?active_form=register',
   ctaSignInHref: 'https://app.gopilot.earth/auth?active_form=login',
   ctaTryHref: 'https://app.gopilot.earth/try-gopilot',

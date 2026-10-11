@@ -26,7 +26,7 @@ export default function ClosingCta() {
         </h2>
 
         <p className="mx-auto mt-4 max-w-[46ch] text-lg leading-relaxed text-white/80">
-          Sign up, draw an area, and ask. 500 tokens, no credit card.
+          Sign up, draw an area, and ask. 50,000 tokens, no credit card.
         </p>
 
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
