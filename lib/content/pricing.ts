@@ -66,7 +66,7 @@ export const PLANS: readonly Plan[] = [
     tagline: 'Explore GoPilot and run your first analyses.',
     price: '€0',
     interval: 'per month',
-    tokens: '500',
+    tokens: '50,000',
     storage: '1 GB',
     featuresHeading: 'Includes',
     features: [
@@ -91,7 +91,7 @@ export const PLANS: readonly Plan[] = [
     tagline: 'For analysts running recurring geospatial work.',
     price: '€149',
     interval: 'per month',
-    tokens: '5,000',
+    tokens: '500,000',
     storage: '100 GB',
     featuresHeading: 'Everything in Free, plus',
     features: [
@@ -119,7 +119,7 @@ export const PLANS: readonly Plan[] = [
     tagline: 'For organizations scaling geospatial intelligence.',
     price: '€499',
     interval: 'per month',
-    tokens: '25,000',
+    tokens: '2,500,000',
     storage: '1 TB',
     featuresHeading: 'Everything in Pro, plus',
     features: [
