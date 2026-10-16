@@ -1,4 +1,4 @@
-import { OFFER_PLANS, PRICE_CURRENCY } from '@/lib/content/pricing'
+import { OFFER_PLANS, PRICE_CURRENCY, TOP_UPS } from '@/lib/content/pricing'
 import { FAQ_ITEMS } from '@/lib/content/faq'
 
 /**
@@ -75,24 +75,46 @@ const softwareApplication = {
 
      There is deliberately no `aggregateRating`: no reviews have been collected
      and fabricating one is a manual-action risk. */
-  offers: OFFER_PLANS.map((plan) => ({
-    '@type': 'Offer',
-    name: plan.name,
-    description: plan.jsonLdDescription,
-    price: plan.priceNumeric,
-    priceCurrency: PRICE_CURRENCY,
-    url: `${SITE_URL}/#pricing`,
-    availability: 'https://schema.org/InStock',
-    priceSpecification: {
-      '@type': 'UnitPriceSpecification',
+  offers: [
+    ...OFFER_PLANS.map((plan) => ({
+      '@type': 'Offer',
+      name: plan.name,
+      description: plan.jsonLdDescription,
       price: plan.priceNumeric,
       priceCurrency: PRICE_CURRENCY,
-      // Monthly, billed one period at a time. No annual plan is published.
-      billingDuration: 1,
-      billingIncrement: 1,
-      unitCode: 'MON',
-    },
-  })),
+      url: `${SITE_URL}/#pricing`,
+      availability: 'https://schema.org/InStock',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        price: plan.priceNumeric,
+        priceCurrency: PRICE_CURRENCY,
+        // Monthly, billed one period at a time. No annual plan is published.
+        billingDuration: 1,
+        billingIncrement: 1,
+        unitCode: 'MON',
+      },
+    })),
+
+    /* The token top-ups, also published on `#pricing`, so they belong here for
+       the same reason the plans do. Their `priceSpecification` is a plain
+       `PriceSpecification` with no billing period: a pack is bought once, and
+       reusing the subscription shape above would tell a crawler these recur
+       monthly. */
+    ...TOP_UPS.map((topUp) => ({
+      '@type': 'Offer',
+      name: topUp.tokens,
+      description: topUp.jsonLdDescription,
+      price: topUp.priceNumeric,
+      priceCurrency: PRICE_CURRENCY,
+      url: `${SITE_URL}/#pricing`,
+      availability: 'https://schema.org/InStock',
+      priceSpecification: {
+        '@type': 'PriceSpecification',
+        price: topUp.priceNumeric,
+        priceCurrency: PRICE_CURRENCY,
+      },
+    })),
+  ],
 }
 
 const organization = {

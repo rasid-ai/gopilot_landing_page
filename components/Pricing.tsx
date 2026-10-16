@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react'
 
 import Reveal from '@/components/Reveal'
-import { PLANS } from '@/lib/content/pricing'
+import { PLANS, TOP_UPS } from '@/lib/content/pricing'
 import { SITE } from '@/lib/content/site'
 
 /**
@@ -93,6 +93,55 @@ export default function Pricing() {
               </li>
             ))}
           </ul>
+
+          {/* Top-ups, from `TOP_UPS`. A sub-section inside §9 rather than a section of
+              its own: it is the same decision, priced the same way, and a buyer only
+              asks "what if I run out?" after reading the plan above it.
+
+              These are tiles, not a fourth row of plan cards: a top-up has one number
+              to compare, not a feature list, and reusing the tall card would read as a
+              choice between tiers rather than a quantity.
+
+              No per-pack "Buy" button, by decision rather than omission. A pack is
+              bought from inside a signed-in account, so three buttons here would each
+              land a guest on a sign-up wall, and they would compete with the plan
+              grid's own CTAs — including the one primary action of the whole page,
+              directly above. The prices answer "what if I run out?" on their own; one
+              quiet link closes the block. */}
+          <div className="card mt-14 p-6 sm:p-8">
+            <div className="text-center">
+              <h3 className="font-display text-xl font-bold text-slate-900">
+                Need more mid-period? Top up.
+              </h3>
+              <p className="mt-2 text-sm text-slate-500">
+                One-time token packs on top of your plan. The bigger the pack, the lower the
+                per-token price.
+              </p>
+            </div>
+
+            <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {TOP_UPS.map((topUp) => (
+                <li
+                  key={topUp.code}
+                  className="rounded-lg bg-brand-soft p-4 text-center sm:text-left"
+                >
+                  <p className="font-semibold text-slate-900">{topUp.tokens}</p>
+                  {/* Holds its line even when empty, so the three prices sit on one
+                      baseline across the row instead of stepping. */}
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    {topUp.saving ?? <span aria-hidden="true">&nbsp;</span>}
+                  </p>
+                  <p className="mt-2 text-2xl font-bold text-slate-800">{topUp.price}</p>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-5 text-center text-sm">
+              <a href={SITE.plansHref} className="link-brand">
+                Top up any time from your account <span aria-hidden="true">&rarr;</span>
+              </a>
+            </p>
+          </div>
 
           {/* Footnote 1 is verbatim from the live site and must not be expanded. The app
               bills geospatial processing in euros against a separate account balance, so

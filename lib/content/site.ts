@@ -15,7 +15,7 @@ export const SITE = {
   /* CAREFUL: the space before the middot is a literal U+00A0 (non-breaking),
      not an ordinary space, and it is invisible in most editors. §4, §14 and
      §15 all spell this label `Sign up
-     free&nbsp;· 500 tokens`: "free · 500" must never break across two lines
+     free&nbsp;· 50,000 tokens`: "free · 50,000" must never break across two lines
      inside the button. It lives here rather than in a component because §4
      requires the label to be byte-identical in the nav, the hero, the pricing
      Free card and the closing band, and a per-component `.replace()` is
