@@ -60,6 +60,7 @@ export default function Hero() {
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-5">
             <a
               href={SITE.ctaPrimaryHref}
+              data-cta="hero"
               className="btn btn-lg btn-primary w-full justify-center sm:w-auto"
             >
               {CTA_LABEL} <span aria-hidden="true">&rarr;</span>

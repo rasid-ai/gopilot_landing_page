@@ -32,6 +32,7 @@ export default function ClosingCta() {
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
             href={SITE.ctaPrimaryHref}
+            data-cta="closing"
             className="btn btn-lg btn-on-brand w-full justify-center sm:w-auto"
           >
             {SITE.ctaPrimaryLabel} <span aria-hidden="true">&rarr;</span>

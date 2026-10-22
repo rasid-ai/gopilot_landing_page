@@ -242,6 +242,7 @@ export default async function ReleasePage({ params }: Params) {
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <a
                 href={SITE.ctaPrimaryHref}
+                data-cta="release"
                 className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-brand transition-colors hover:bg-brand-mint hover:text-brand-dark"
               >
                 {SITE.ctaPrimaryLabel}

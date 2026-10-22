@@ -19,6 +19,13 @@
   # a lockfile is present; this makes the intent explicit.
   NPM_FLAGS = "--prefer-offline --no-audit"
 
+  # The PostHog project token is a NEXT_PUBLIC_ var — it is MEANT to ship in the
+  # client bundle (a public, write-only analytics key, like a GA measurement id),
+  # so it legitimately appears in build output. Exempt it from Netlify's secret
+  # scanner, or that expected exposure fails the deploy. Same exemption as the
+  # rasid.ai site. Set the value itself in the Netlify UI, not here.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN"
+
 # ---------------------------------------------------------------------------
 # Caching
 #

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
+
+import Analytics from '@/components/Analytics'
 import './globals.css'
 
 /* Fonts are SELF-HOSTED, committed as woff2 under app/fonts/.
@@ -189,6 +191,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         {children}
+        {/* Renders null. Last in the body so it is the last thing hydrated,
+            and a no-op entirely when the PostHog token is unset. */}
+        <Analytics />
       </body>
     </html>
   )

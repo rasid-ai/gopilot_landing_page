@@ -71,7 +71,7 @@ export default function Nav() {
               button to two lines inside a 64px-tall header. The trailing arrow
               is decorative, so it is dropped below `sm` to buy back the ~20px
               that keeps the burger on screen on the narrowest phones. */}
-          <a href={SITE.ctaPrimaryHref} className="btn btn-primary px-3 sm:px-4">
+          <a href={SITE.ctaPrimaryHref} data-cta="nav" className="btn btn-primary px-3 sm:px-4">
             <span className="whitespace-nowrap sm:hidden">{ctaShort}</span>
             <span className="hidden whitespace-nowrap sm:inline">{SITE.ctaPrimaryLabel}</span>
             <span aria-hidden="true" className="hidden sm:inline">

@@ -85,6 +85,12 @@ export default function Pricing() {
 
                   <a
                     href={plan.ctaHref}
+                    /* All four are tagged, but only Free's href is the signup
+                       URL, so only Free counts toward the conversion metric —
+                       the listener checks the href, not just the attribute.
+                       If a paid card is ever pointed at signup, it starts
+                       counting with no change here. See `lib/analytics.ts`. */
+                    data-cta={`pricing_${plan.code}`}
                     className={`btn ${plan.ctaVariant} mt-auto w-full justify-center`}
                   >
                     {plan.ctaLabel}

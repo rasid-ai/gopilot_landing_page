@@ -123,6 +123,7 @@ export default function Footer() {
             </p>
             <a
               href={SITE.ctaPrimaryHref}
+              data-cta="footer"
               className="btn btn-on-brand mt-5 w-full justify-center sm:w-auto"
             >
               <span className="whitespace-nowrap">{SITE.ctaPrimaryLabel}</span>{' '}

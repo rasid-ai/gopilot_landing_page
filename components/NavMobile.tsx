@@ -153,6 +153,7 @@ export default function NavMobile() {
             Returning users get the footer's Sign in link. */}
         <a
           href={SITE.ctaPrimaryHref}
+          data-cta="nav_mobile"
           onClick={close}
           className="btn btn-primary w-full justify-center"
         >
