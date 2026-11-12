@@ -47,9 +47,26 @@ npm run lint
 No environment variables are required. Every one of them is optional and the
 site builds and runs correctly with none set.
 
-`npm run build` runs `prebuild` first (`scripts/check-assets.mjs`). That gate
-fails the build if a required image is missing or oversized, which is what stops
-a deploy whose Open Graph card would render blank on LinkedIn and Slack.
+`npm run build` runs `prebuild` first: `scripts/check-assets.mjs`, then
+`scripts/fetch-releases.mjs` and `scripts/fetch-legal.mjs`. The asset gate fails
+the build if a required image is missing or oversized, which is what stops a
+deploy whose Open Graph card would render blank on LinkedIn and Slack. The two
+fetch scripts snapshot the content this site does not author — the release notes
+and the Terms of Service and Privacy Policy — from the production API into
+`lib/content/*.generated.json`, and also fail the build rather than export a
+stale or empty page. See §31 and §32 of the spec.
+
+Those snapshots are gitignored, so a **fresh clone must build once before
+`npm run dev` works**:
+
+```bash
+npm run prebuild   # or: node scripts/fetch-releases.mjs && node scripts/fetch-legal.mjs
+npm run dev
+```
+
+The practical consequence for content: a release published in the RASID admin,
+or a new version of the terms, does not appear on this site until it rebuilds.
+Publishing and deploying are two separate acts.
 
 Build with the canonical host set, the way CI should:
 
@@ -85,15 +102,22 @@ app/
   page.tsx            composition only                  §19
   globals.css         tokens, components, demo motion    §17, §22.11
   sitemap.ts robots.ts                                   §21
+  releases/           changelog index and one page each  §31
+  terms/ privacy-policy/   the two legal documents       §32
 components/
   Nav NavMobile Footer Hero ...                          §4-§15
   JsonLd.tsx          three ld+json blocks               §20
   Analytics.tsx       PostHog, one metric                 —
+  LegalDocument.tsx   shared chrome for both legal pages §32.3
   demo/               the hero's animated transcript     §22
 lib/content/          all copy and data, one module each §25
+lib/releases.ts       reads the release snapshot         §31.4
+lib/legal.ts          reads the legal snapshot           §32.4
 lib/analytics.ts      the event contract                  —
 scripts/
   check-assets.mjs    the prebuild gate                  §24.3
+  fetch-releases.mjs  release notes, from the API        §31.4
+  fetch-legal.mjs     terms and privacy, from the API    §32.4
   make-og.py          regenerates the 1200x630 OG card   §24.2
 docs/BUILD_SPEC.md    the contract
 ```

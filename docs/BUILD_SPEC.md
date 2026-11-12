@@ -3949,3 +3949,97 @@ Affected: the four `NAV_LINKS` section targets, the `Nav` logo, and the footer's
 - No per-release OG image beyond the API `featured_image`. A release without one falls back to the site default from §18.
 - No pagination on `/releases/`. Ten releases is one page; past roughly forty this needs revisiting.
 - No RSS or Atom feed. Worth adding if the changelog becomes a subscribe-able surface.
+
+---
+
+## 32. AMENDMENT B, TERMS OF SERVICE AND PRIVACY POLICY
+
+**Status:** this section AMENDS the contract above. It supersedes two lines written when this was a single-page build: the §2 cut-list row that struck `/privacy` and `/terms` ("Legal links point at the real app URLs"), and the §15.1 footer table, whose `Terms of Service` and `Privacy Policy` hrefs pointed at `app.gopilot.earth`. Both documents are now served from this origin. Everything else in this document stands.
+
+### 32.1 Why they moved on-site
+
+The cut list was right that a legal page adds nothing to the pitch. It was wrong about where the link should go. Sending a visitor who is *mid-evaluation* to `app.gopilot.earth/terms` hands them a login-shaped subdomain and a page that renders client-side, for the one request where the answer has to be instant and obviously ours. Three concrete costs:
+
+- **Compliance.** §15.1 already records why both links are mandatory here: self-serve card payments, plus reCAPTCHA on the signup form, which makes a reachable privacy policy a condition of Google's own terms. A link into a SPA that needs JavaScript to show the policy text is a weaker answer to that than a static file.
+- **Indexing.** The app's copies are client-rendered under a subdomain built to be crawled as little as possible. These are the pages a reviewer, a procurement team or an answer engine looks for when checking whether a vendor is real; they should exist as static HTML on the marketing origin, and be in the sitemap.
+- **Entity.** Same argument as §15.1's `rasid.ai` links, in the other direction. Legal pages that live on the domain being evaluated keep the trust signal attached to `gopilot.earth`.
+
+### 32.2 One source of truth, which is the backend
+
+**Nothing here restates the terms.** Both documents are edited in the RASID admin and read from the same two public endpoints the product app already calls (saas-ui `src/features/auth/api.ts`):
+
+| Document | Endpoint | Response |
+|---|---|---|
+| Terms of Service | `GET /accounts/meta/tos/` | `{ version, content, effective_date }` |
+| Privacy Policy | `GET /accounts/meta/privacy-policy/` | `{ version, content, effective_date }` |
+
+Both are unauthenticated: no session, no CSRF, which is what makes them readable from a static build. `content` is Markdown; the app renders it with `react-markdown` + `remark-gfm`, this site converts it at build time (§32.4). `version` and `effective_date` are rendered from the payload, never typed into this repo, so the version line cannot fall behind the text it describes.
+
+The rule this enforces is the one that matters: **a user cannot be shown terms here that differ from the terms they accepted in the app.** The app's TOS gate (`POST /accounts/accept-tos/`, saas-ui `TosPage.tsx`) and this page read the same row.
+
+### 32.3 Routes added
+
+| Route | Output | Purpose |
+|---|---|---|
+| `/terms/` | static | The SaaS Agreement. |
+| `/privacy-policy/` | static | The Privacy Policy. |
+
+Route names match the app's own (`/terms`, `/privacy-policy`), so a link copied between the two properties keeps working and nobody has to remember which path belongs to which host. `lib/content/site.ts` now holds `termsHref: '/terms/'` and `privacyHref: '/privacy-policy/'`; the footer's existing `href.startsWith('/')` test routes them through `next/link` with no edit (§31.10).
+
+Both pages are composed the way §19 requires: `Nav`, `main#main`, `Footer`, no `"use client"`. The shared chrome, version line and cross-link live in `components/LegalDocument.tsx`; each route keeps only its own `metadata` and JSON-LD, which genuinely differ. Body measure is `max-w-measure` (68ch, the token §16 added for exactly this), not the page width: 31,000 characters of contract at 1200px is unreadable.
+
+### 32.4 Snapshotted at build time, same as the release notes
+
+`scripts/fetch-legal.mjs`, wired into `prebuild` after `fetch-releases.mjs`, reads both endpoints from PRODUCTION, converts the Markdown to HTML and writes `lib/content/legal.generated.json`. `lib/legal.ts` is the only reader. The reasoning is §31.4's, verbatim and for higher stakes: `output: 'export'` rejects an uncacheable fetch, and Next's cacheable default would let Netlify's restored `.next/cache` rebuild the page from a stale copy of the API — which for a changelog is embarrassing and for a contract is a misrepresentation of what the user agreed to. The file is gitignored, like the releases snapshot, so it can never be hand-edited into disagreeing with the admin.
+
+Conversion uses `marked` (`gfm: true`, `breaks: false`), a **devDependency**: it runs in the prebuild script only, never in a component, so the client bundle is unchanged — `/terms` and `/privacy-policy` ship the same 109 kB First Load JS as `/releases`, and §28.7's rule that no new runtime dependency reaches the bundle still holds. `breaks: false` is deliberate: the documents are Word exports with CRLF endings, and treating every newline as a `<br>` would shred the paragraphs. The HTML is injected with `dangerouslySetInnerHTML`, the same trust model §31 established for `release.content` — first-party content from the admin, baked into a static file, with no path for visitor input.
+
+Missing `version`, `content` or `effective_date` stops the build. A legal page with no version and no effective date is not a legal page.
+
+### 32.5 A new version of the terms does not appear until this site rebuilds
+
+§31.8, again, and the reason to care is sharper. The app picks up an admin edit within its 5-minute query cache; this site picks it up on the next deploy. So a legal change that must be live everywhere at once needs a deploy triggered with it, and until the build hook or scheduled build of §31.8 exists, that trigger is a person.
+
+### 32.6 The source documents have defects, and they are not fixed here
+
+The two documents are Word exports and they arrive with problems that are visible on the rendered page. None of them is patched in this repo: legal text is edited in the admin, or the two properties start serving different terms.
+
+- **The Terms link the words "Privacy Policy" to `https://www.meetup.com/privacy/`** (§3.7 of the document), a leftover from whatever template it was drafted from. This is the one worth fixing first — it is wrong in the app today as well. `scripts/fetch-legal.mjs` now **warns in the build log** for every link in the legal copy that leaves `rasid.ai`/`gopilot.earth`, so this stays visible on every deploy until it is corrected. The warning does not fail the build: a legitimate external reference is plausible.
+- **Section numbering restarts at 1.** Each top-level section is its own single-item Markdown list separated by paragraphs, so every one renders as "1."; a few render as "2." or "3." because sub-lists absorbed them. Identical in the app. The fix is to give the documents real headings in the admin.
+- **There are no headings at all** — section titles are bold paragraphs, so the pages carry a single `h1` and no outline, and no table of contents can be generated for a 31,000-character contract. Also an admin fix, and the one that would most improve the page.
+
+### 32.7 Verification performed
+
+- `npx tsc --noEmit` clean; `npm run lint` clean (only the five pre-existing `no-img-element` warnings).
+- `npm run build` exports 20 pages, including `/terms` and `/privacy-policy`, both at 109 kB First Load JS — unchanged from `/releases`, confirming `marked` stayed out of the bundle.
+- `out/terms/index.html` and `out/privacy-policy/index.html` each contain the real `<title>`, `description`, `canonical` with trailing slash, `og:*`, exactly one `h1`, one `WebPage` JSON-LD block carrying `version`, `dateModified` and a `BreadcrumbList`, the `Version 2.0 · Effective 25 August 2026` line, and the full document body in the static HTML. Checked by reading the exported files.
+- `out/sitemap.xml` lists 15 URLs; `/terms/` and `/privacy-policy/` are present with trailing slashes, `lastModified` set to each document's effective date rather than `BUILD_TIME` — a rebuild that did not change the terms must not claim the terms changed.
+- The footer on the exported home page links `/terms/` and `/privacy-policy/` as internal `next/link` routes, with no `target="_blank"`.
+- Meta parity against `out/index.html`, tag by tag: `og:image`, `og:site_name`, `og:locale`, `twitter:image`, `robots` (`index, follow`), `googlebot` (`max-image-preview:large`, `max-snippet:-1`) and `keywords` all present on both legal pages. The first four were missing until §32.8.
+- GEO surface: the full contract is in the static HTML with no JavaScript required, which the app's client-rendered copies are not; `robots.txt`'s named AI-crawler grants (§21.2) cover these routes under `Allow: /`; both pages carry `inLanguage`, a `version`, a `dateModified` and a two-level `BreadcrumbList`.
+
+### 32.8 Share cards: a defect found while checking SEO parity, fixed site-wide
+
+Checking these pages against the home page turned up something that was not about legal pages at all.
+
+**Next merges `metadata` shallowly.** A page that declares its own `openGraph` **replaces** the layout's object; it does not inherit `images`, `siteName` or `locale` from §18. So every sub-page added since the single-page build was exporting without a share card:
+
+| Page | Before | After |
+|---|---|---|
+| `/releases/` | no `og:image`, no `og:site_name`, no `og:locale` | site card, both tags |
+| `/releases/<id>/` | API `featured_image` only; **no image at all** when the release had none; no `og:site_name`/`og:locale` | API image, or the site card as fallback, plus both tags |
+| `/terms/`, `/privacy-policy/` | same gap, as first written | site card, both tags |
+
+`twitter.card` was `summary_large_image` on all of them, which makes it worse than a plain omission: LinkedIn and Slack render a blank slab with a URL in it, and that is the preview for the link the product portal puts in front of signed-in users.
+
+**This supersedes the first bullet of §31.11**, which claimed a release with no `featured_image` "falls back to the site default from §18". It did not. Nothing fell back.
+
+The fix is `lib/seo.ts`: `OG_IMAGE`, `OG_IMAGE_ALT`, `OG_SHARED` (`siteName` + `locale`) and `ogImages()` / `twitterImages()`, which take the page's own image or return the site card. `app/layout.tsx` now reads the same constants instead of holding a second copy, and every page-level `openGraph` spreads `OG_SHARED`. One module, so the gap cannot reopen the next time a route is added — which is exactly how it opened the first time.
+
+`og:type` on both legal pages is `website`, not `article`: the JSON-LD already refuses to call a contract editorial content, and `article` would invite `article:*` tags that say nothing true about it.
+
+### 32.9 Not done here
+
+- No cookie or consent banner. The app has one (`CookieBanner.tsx`); this site still ships only PostHog, and whether that needs a banner is a decision for the team, not a consequence of this amendment.
+- No `/dpa`, `/subprocessors` or security page. Nothing in the API serves them.
+- No table of contents or deep links into sections, for the reason in §32.6: the source has no headings to anchor to.
