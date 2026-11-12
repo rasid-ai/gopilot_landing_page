@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { SITE } from '@/lib/content/site'
+import { OG_SHARED, ogImages, twitterImages } from '@/lib/seo'
 import {
   getAllReleases,
   getRelease,
@@ -48,21 +49,26 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: release.summary,
     alternates: { canonical: `/releases/${release.id}/` },
     openGraph: {
+      /* §31.11 claimed a release with no `featured_image` "falls back to the
+         site default from §18". It did not: Next replaces this object rather
+         than merging into it, so those pages exported with no image, and none
+         of them carried og:site_name or og:locale either. `ogImages()` is that
+         fallback, for real this time. The API image is absolute already —
+         metadataBase only rewrites a relative path. */
+      ...OG_SHARED,
       type: 'article',
       url,
       title: `${title} | GoPilot`,
       description: release.summary,
       publishedTime: release.release_date,
       modifiedTime: release.updated_at,
-      // Absolute already, served from the API host. metadataBase would only
-      // rewrite a relative path, so this has to be passed through as is.
-      images: release.featured_image ? [{ url: release.featured_image }] : undefined,
+      images: ogImages(release.featured_image),
     },
     twitter: {
       card: 'summary_large_image',
       title: `${title} | GoPilot`,
       description: release.summary,
-      images: release.featured_image ? [release.featured_image] : undefined,
+      images: twitterImages(release.featured_image),
     },
   }
 }

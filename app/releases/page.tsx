@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowRight, Sparkles } from 'lucide-react'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
+import { OG_SHARED, ogImages, twitterImages } from '@/lib/seo'
 import {
   getAllReleases,
   formatReleaseDate,
@@ -28,15 +29,21 @@ export const metadata: Metadata = {
      a 308 instead of the page. */
   alternates: { canonical: '/releases/' },
   openGraph: {
+    /* Added with the legal pages: this page declared its own `openGraph`, and
+       because Next replaces rather than merges, it had been exporting with no
+       share image, no og:site_name and no og:locale since §31. See lib/seo.ts. */
+    ...OG_SHARED,
     type: 'website',
     url: `${SITE_URL}/releases/`,
     title: `${TITLE} | GoPilot`,
     description: DESCRIPTION,
+    images: ogImages(),
   },
   twitter: {
     card: 'summary_large_image',
     title: `${TITLE} | GoPilot`,
     description: DESCRIPTION,
+    images: twitterImages(),
   },
 }
 
