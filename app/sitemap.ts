@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { getAllLegalDocs } from '@/lib/legal'
 import { getAllReleases } from '@/lib/releases'
 
 /* `output: 'export'` has no server, so Next refuses to build a metadata route
@@ -30,11 +31,6 @@ const routes: Route[] = [
      API rather than listed here, because the set changes with every release and
      a hand-maintained list would go stale silently. */
   { path: '/releases', changeFrequency: 'weekly', priority: 0.7 },
-
-  // Uncomment each line ONLY once the corresponding app/<route>/page.tsx exists
-  // and returns 200 in the exported `out/` directory.
-  // { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 },
-  // { path: '/terms',   changeFrequency: 'yearly', priority: 0.3 },
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -62,5 +58,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }))
 
-  return [...staticEntries, ...releaseEntries]
+  /* Terms and Privacy, from the same snapshot the pages render, so the sitemap
+     cannot list a legal URL that is not in `out/`. `lastModified` is the
+     document's effective date, not BUILD_TIME: a rebuild that did not change
+     the terms must not claim the terms changed. Low priority — these pages
+     exist for visitors and for compliance, not to rank. */
+  const legalEntries: MetadataRoute.Sitemap = getAllLegalDocs().map((doc) => ({
+    url: `${SITE_URL}${doc.path}`,
+    lastModified: new Date(doc.effective_date),
+    changeFrequency: 'yearly',
+    priority: 0.3,
+  }))
+
+  return [...staticEntries, ...legalEntries, ...releaseEntries]
 }

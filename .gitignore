@@ -40,3 +40,8 @@ yarn-error.log*
 # Build-time snapshot of the release notes (scripts/fetch-releases.mjs).
 # Regenerated on every build; never edited by hand, so it is not tracked.
 lib/content/releases.generated.json
+
+# Build-time snapshot of the Terms of Service and Privacy Policy
+# (scripts/fetch-legal.mjs). Same rule: generated, never hand-edited. Editing
+# this file would publish terms that differ from the ones the app serves.
+lib/content/legal.generated.json

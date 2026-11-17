@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 
 import Analytics from '@/components/Analytics'
+import { OG_SHARED, ogImages, twitterImages } from '@/lib/seo'
 import './globals.css'
 
 /* Fonts are SELF-HOSTED, committed as woff2 under app/fonts/.
@@ -46,11 +47,10 @@ const TITLE = 'Geospatial AI Agent for Satellite Imagery | GoPilot'
 const DESCRIPTION =
   'GoPilot is an AI geospatial agent that runs GIS analysis from plain English — 10,000+ datasets, hundreds of AI models, raster and vector exports. Try it free.'
 
-// 1200x630 PNG. Must physically exist at public/og/gopilot-og.png or every
-// share card on LinkedIn/Slack/X renders blank. See the asset spec.
-const OG_IMAGE = '/og/gopilot-og.png'
-const OG_IMAGE_ALT =
-  'GoPilot chat panel beside a map, answering a plain-language request with a generated satellite-derived vector layer'
+/* The 1200x630 card and its alt text now live in lib/seo.ts, because a
+   sub-page that declares its own `openGraph` has to restate them — Next merges
+   metadata shallowly and does not inherit `images` from here. Keeping two
+   copies is how /releases/ ended up with no share image at all. */
 
 export const metadata: Metadata = {
   // Makes every relative URL below absolute at build time. Required for
@@ -92,18 +92,15 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
+    ...OG_SHARED,
     type: 'website',
-    siteName: 'GoPilot by RASID',
-    locale: 'en_US',
     url: '/',
     // Deliberately different from <title>: the share card leads with the
     // product, the SERP title leads with the category keyword.
     title: 'GoPilot — the geospatial AI agent that operates the map',
     description:
       'Ask in plain language. GoPilot finds the satellite data, runs the right AI models and hands back raster and vector layers on a live map.',
-    images: [
-      { url: OG_IMAGE, width: 1200, height: 630, alt: OG_IMAGE_ALT, type: 'image/png' },
-    ],
+    images: ogImages(),
   },
 
   twitter: {
@@ -114,7 +111,7 @@ export const metadata: Metadata = {
     title: 'GoPilot — the geospatial AI agent that operates the map',
     description:
       'Ask in plain language. GoPilot finds the satellite data, runs the right AI models and hands back raster and vector layers on a live map.',
-    images: [{ url: OG_IMAGE, alt: OG_IMAGE_ALT }],
+    images: twitterImages(),
   },
 
   robots: {

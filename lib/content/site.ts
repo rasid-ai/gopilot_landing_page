@@ -35,6 +35,12 @@ export const SITE = {
   awardLabel: 'Winner, AWS and thriveGEO GenAI for Geospatial Challenge 2026',
   linkedin: 'https://www.linkedin.com/company/rasid-ai/',
   youtube: 'https://www.youtube.com/@RASIDAI',
-  termsHref: 'https://app.gopilot.earth/terms',
-  privacyHref: 'https://app.gopilot.earth/privacy-policy',
+  /* On-site now, not the app's copies (§15.1 predates these pages existing).
+     Same documents, same API, same route names as the app — see lib/legal.ts —
+     but served from this origin, so a visitor checking the terms before signing
+     up is never bounced onto app.gopilot.earth, and the pages accrue their
+     links here. The trailing slash is required: trailingSlash is on, so
+     `/terms` would 308 to `/terms/`. */
+  termsHref: '/terms/',
+  privacyHref: '/privacy-policy/',
 } as const

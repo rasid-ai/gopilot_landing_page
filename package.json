@@ -5,7 +5,7 @@
   "description": "Landing page for GoPilot — the geospatial AI agent by RASID",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/check-assets.mjs && node scripts/fetch-releases.mjs",
+    "prebuild": "node scripts/check-assets.mjs && node scripts/fetch-releases.mjs && node scripts/fetch-legal.mjs",
     "build": "next build",
     "start": "next start",
     "serve": "npx --yes serve out -l 4000",
@@ -29,6 +29,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9.39.5",
     "eslint-config-next": "^15.5.27",
+    "marked": "^18.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.8.3"
