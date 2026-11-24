@@ -15,7 +15,7 @@ Six specialists reported. Their reports are resolved here. **If something in thi
 |---|---|---|
 | **H1** | `Ask Earth a question.` / `Get the layer back.` | The brand's signature shape is two short declaratives separated by a full stop ("Start free. Scale when you need to.", "One engine. Three ways to use it."). This line is the voice specialist's top candidate, it ends on the *artefact* rather than the chat, and it is memorable. The primary keyword lives in the `<title>`, the eyebrow and the subhead — which is where Google actually reads it. A keyword-stuffed H1 ("The geospatial AI agent that runs your GIS work in plain language") is 12 flat words and loses the one thing a challenger brand needs: a line people repeat. |
 | **Eyebrow** | `GEOSPATIAL AI AGENT · BY RASID` | Disambiguates the category in one line, carries the primary keyword above the H1, and inherits consultancy credibility at a glance. |
-| **Subhead** | `GoPilot is RASID's AI geospatial agent. Describe the analysis in plain language. It finds the satellite data, runs the models, and hands back GeoTIFF and GeoJSON layers you can open in QGIS.` | Names two file formats and one desktop GIS above the fold. For this buyer that is the highest-value trust move on the page: a format is a commitment you cannot fake. Both formats and QGIS are verified on the live site and in the code. |
+| **Subhead** | `GoPilot is RASID's AI geospatial agent. Describe the analysis in plain language. It finds the satellite data, runs the models, and hands back GeoTIFF and GeoJSON layers you can open directly on the web, in QGIS, and in ArcGIS Pro.` | Names two file formats and all three places the layer opens above the fold. For this buyer that is the highest-value trust move on the page: a format is a commitment you cannot fake. Both formats, the web viewer, the QGIS plugin and the ArcGIS Pro add-in are verified on the live site and in the code. |
 | **Primary CTA** | `Sign up free · 500 tokens` → `https://app.gopilot.earth/auth?active_form=register` | One label everywhere: nav, hero, pricing Free card, closing band. "Sign up free" is the brand's own verb (verbatim on the live Free plan CTA). "· 500 tokens" answers the buyer's unspoken "free until what?", which no competitor answers. The middot is on-brand (`2026 · Winner`, `GoServers · MCP`) and the brand uses no em dashes. |
 | **Secondary CTA** | `Try it now, no account` → `https://app.gopilot.earth/try-gopilot` | A real, live, zero-friction trial of the real backend beats a video we do not have. This is the one structural advantage GoPilot has over Harvey and Sierra. |
 | **Tertiary CTA** | `Book a 30-minute call` → `https://calendly.com/rasid/30mins` | Closing band only. Thirty, not twenty — that is the real calendar link. |
@@ -325,7 +325,7 @@ Every content section follows this shell:
   <p class="mt-5 text-lg leading-relaxed text-slate-600">
     GoPilot is RASID&rsquo;s AI geospatial agent. Describe the analysis in plain language.
     It finds the satellite data, runs the models, and hands back GeoTIFF and GeoJSON layers
-    you can open in QGIS.
+    you can open directly on the web, in QGIS, and in ArcGIS Pro.
   </p>
 
   <p class="mt-7 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
@@ -3839,7 +3839,7 @@ Flagged rather than hidden. None of these blocks the build.
 A GIS analyst lands here, reads for forty seconds, and can answer four questions without talking to anyone:
 
 1. **What category is this?** `GEOSPATIAL AI AGENT · BY RASID`, above the H1.
-2. **What do I get?** `GeoTIFF and GeoJSON layers you can open in QGIS`, in the subhead.
+2. **What do I get?** `GeoTIFF and GeoJSON layers you can open directly on the web, in QGIS, and in ArcGIS Pro`, in the subhead.
 3. **Can I believe it?** They watched a real run name its scene, log sixteen tools, and admit a missing tool, in the hero.
 4. **What does it cost to find out?** `Sign up free · 500 tokens. No credit card.`
 
