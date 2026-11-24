@@ -54,7 +54,7 @@ export default function Hero() {
           <p className="mx-auto mt-5 max-w-[44rem] text-lg leading-relaxed text-slate-600">
             GoPilot is RASID&rsquo;s AI geospatial agent. Describe the analysis in plain language. It
             finds the satellite data, runs the models, and hands back GeoTIFF and GeoJSON layers you
-            can open in QGIS.
+            can open directly on the web, in QGIS, and in ArcGIS Pro.
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-5">
